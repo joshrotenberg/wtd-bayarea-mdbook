@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>How to mdbook - wtd-bayarea</title>
+        <title>How to use mdbook - wtd-bayarea</title>
         <!-- Custom HTML head -->
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
@@ -75,7 +75,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">Introduction</a></li><li class="chapter-item expanded "><a href="what.html"><strong aria-hidden="true">1.</strong> What is mdbook</a></li><li class="chapter-item expanded "><a href="who.html"><strong aria-hidden="true">2.</strong> Who uses mdbook</a></li><li class="chapter-item expanded "><a href="why.html"><strong aria-hidden="true">3.</strong> Why mdbook</a></li><li class="chapter-item expanded "><a href="how.html" class="active"><strong aria-hidden="true">4.</strong> How to mdbook</a></li><li class="chapter-item expanded "><a href="wild.html"><strong aria-hidden="true">5.</strong> In the wild</a></li><li class="chapter-item expanded affix "><a href="reference.html">Reference</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">Introduction</a></li><li class="chapter-item expanded "><a href="what.html"><strong aria-hidden="true">1.</strong> What is mdbook</a></li><li class="chapter-item expanded "><a href="how.html" class="active"><strong aria-hidden="true">2.</strong> How to use mdbook</a></li><li class="chapter-item expanded "><a href="who.html"><strong aria-hidden="true">3.</strong> Who uses mdbook</a></li><li class="chapter-item expanded affix "><a href="reference.html">Reference</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -163,6 +163,8 @@ in a directory will become an <code>index.html</code> in the generated output:</
 [Appendix](./appendix.md)
 </code></pre>
 <h2 id="config-the-config"><a class="header" href="#config-the-config">Config the config</a></h2>
+<p>The first section is created for us by the <code>init</code> command. In this example, we've also added some options for the
+search functionality. Plugins such as preprocessors and alternative backends can also be configured here.</p>
 <pre><code class="language-toml">[book]
 authors = [&quot;josh rotenberg&quot;]
 language = &quot;en&quot;
@@ -182,16 +184,39 @@ boost-paragraph = 1
 expand = true
 heading-split-level = 2
 </code></pre>
-<h2 id="draw-the-rest-of-the-owl"><a class="header" href="#draw-the-rest-of-the-owl">Draw the rest of the owl</a></h2>
+<h2 id="integrate-continuously"><a class="header" href="#integrate-continuously">Integrate Continuously</a></h2>
+<p>Deploying an mdbook to GitHub Pages is easy:</p>
+<pre><code class="language-yaml">jobs:
+  deploy:
+    runs-on: ubuntu-20.04
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup mdBook
+        uses: peaceiris/actions-mdbook@v1
+        with:
+           mdbook-version: 'latest'
+
+      - run: mdbook build
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.ref == 'refs/heads/main' }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./book
+</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="why.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="what.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
-                            <a rel="next" href="wild.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="who.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         <div style="clear: both"></div>
@@ -200,10 +225,10 @@ heading-split-level = 2
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="why.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="what.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
-                    <a rel="next" href="wild.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="who.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

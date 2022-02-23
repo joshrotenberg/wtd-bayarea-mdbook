@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">Introduction</a></li><li class="chapter-item expanded "><a href="what.html"><strong aria-hidden="true">1.</strong> What is mdbook</a></li><li class="chapter-item expanded "><a href="who.html"><strong aria-hidden="true">2.</strong> Who uses mdbook</a></li><li class="chapter-item expanded "><a href="why.html"><strong aria-hidden="true">3.</strong> Why mdbook</a></li><li class="chapter-item expanded "><a href="how.html"><strong aria-hidden="true">4.</strong> How to mdbook</a></li><li class="chapter-item expanded "><a href="wild.html"><strong aria-hidden="true">5.</strong> In the wild</a></li><li class="chapter-item expanded affix "><a href="reference.html">Reference</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">Introduction</a></li><li class="chapter-item expanded "><a href="what.html"><strong aria-hidden="true">1.</strong> What is mdbook</a></li><li class="chapter-item expanded "><a href="how.html"><strong aria-hidden="true">2.</strong> How to use mdbook</a></li><li class="chapter-item expanded "><a href="who.html"><strong aria-hidden="true">3.</strong> Who uses mdbook</a></li><li class="chapter-item expanded affix "><a href="reference.html">Reference</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -152,31 +152,9 @@
 <li>Markdown-based content layout (SUMMARY.md)</li>
 <li>Preprocessor and/or Alternative Backend (i.e. PDF, epub, etc.) support via plugins</li>
 <li>Also a Rust library</li>
+<li>Not a full featured static site generator like Hugo or Docusaurus</li>
 <li>Open source (Mozilla Public License v2.0)</li>
 </ul>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="who-uses-mdbook"><a class="header" href="#who-uses-mdbook">Who uses mdbook</a></h1>
-<p>Official Rust Projects</p>
-<ul>
-<li>Rust (The Book): <a href="https://doc.rust-lang.org/book/">https://doc.rust-lang.org/book/</a></li>
-<li>The Cargo Book: <a href="https://doc.rust-lang.org/cargo/index.html">https://doc.rust-lang.org/cargo/index.html</a></li>
-<li>Rustdoc Book: <a href="https://doc.rust-lang.org/rustdoc/index.html">https://doc.rust-lang.org/rustdoc/index.html</a></li>
-<li>Rustc Book: <a href="https://doc.rust-lang.org/rustc/index.html">https://doc.rust-lang.org/rustc/index.html</a></li>
-<li>Clippy Book (WIP): <a href="https://github.com/rust-lang/rust-clippy/pull/7359">https://github.com/rust-lang/rust-clippy/pull/7359</a></li>
-<li>Rust by Example: <a href="https://doc.rust-lang.org/stable/rust-by-example/">https://doc.rust-lang.org/stable/rust-by-example/</a></li>
-<li>Rustnomicon: <a href="https://doc.rust-lang.org/nomicon/index.html">https://doc.rust-lang.org/nomicon/index.html</a></li>
-<li>WebAssembly, CLI, Embedded, etc.</li>
-</ul>
-<p>Other Rust Projects</p>
-<ul>
-<li>cargo-generate: <a href="https://cargo-generate.github.io/cargo-generate/index.html">https://cargo-generate.github.io/cargo-generate/index.html</a></li>
-<li>Dioxus: <a href="https://dioxuslabs.com/nightly/guide/">https://dioxuslabs.com/nightly/guide/</a></li>
-</ul>
-<p>Other Projects</p>
-<ul>
-<li>Pan Docs: <a href="https://gbdev.io/pandocs/">https://gbdev.io/pandocs/</a></li>
-<li>Lisp-Flavored Erlang: <a href="https://lfe.io/books/rebar3-quick-start/">https://lfe.io/books/rebar3-quick-start/</a></li>
-</ul>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="why-mdbook"><a class="header" href="#why-mdbook">Why mdbook</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="how-to-mdbook"><a class="header" href="#how-to-mdbook">How to mdbook</a></h1>
 <h2 id="initialize-a-new-book"><a class="header" href="#initialize-a-new-book">Initialize a new book</a></h2>
 <pre><code class="language-sh">$ mdbook init --title=&quot;my new book&quot; --ignore=git my-new-book
@@ -206,6 +184,8 @@ in a directory will become an <code>index.html</code> in the generated output:</
 [Appendix](./appendix.md)
 </code></pre>
 <h2 id="config-the-config"><a class="header" href="#config-the-config">Config the config</a></h2>
+<p>The first section is created for us by the <code>init</code> command. In this example, we've also added some options for the
+search functionality. Plugins such as preprocessors and alternative backends can also be configured here.</p>
 <pre><code class="language-toml">[book]
 authors = [&quot;josh rotenberg&quot;]
 language = &quot;en&quot;
@@ -225,8 +205,52 @@ boost-paragraph = 1
 expand = true
 heading-split-level = 2
 </code></pre>
-<h2 id="draw-the-rest-of-the-owl"><a class="header" href="#draw-the-rest-of-the-owl">Draw the rest of the owl</a></h2>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="in-the-wild"><a class="header" href="#in-the-wild">In the wild</a></h1>
+<h2 id="integrate-continuously"><a class="header" href="#integrate-continuously">Integrate Continuously</a></h2>
+<p>Deploying an mdbook to GitHub Pages is easy:</p>
+<pre><code class="language-yaml">jobs:
+  deploy:
+    runs-on: ubuntu-20.04
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup mdBook
+        uses: peaceiris/actions-mdbook@v1
+        with:
+           mdbook-version: 'latest'
+
+      - run: mdbook build
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.ref == 'refs/heads/main' }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./book
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="who-uses-mdbook"><a class="header" href="#who-uses-mdbook">Who uses mdbook</a></h1>
+<p>Official Rust Projects</p>
+<ul>
+<li>Rust (The Book): <a href="https://doc.rust-lang.org/book/">https://doc.rust-lang.org/book/</a></li>
+<li>The Cargo Book: <a href="https://doc.rust-lang.org/cargo/index.html">https://doc.rust-lang.org/cargo/index.html</a></li>
+<li>Rustdoc Book: <a href="https://doc.rust-lang.org/rustdoc/index.html">https://doc.rust-lang.org/rustdoc/index.html</a></li>
+<li>Rustc Book: <a href="https://doc.rust-lang.org/rustc/index.html">https://doc.rust-lang.org/rustc/index.html</a></li>
+<li>Clippy Book (WIP): <a href="https://github.com/rust-lang/rust-clippy/pull/7359">https://github.com/rust-lang/rust-clippy/pull/7359</a></li>
+<li>Rust by Example: <a href="https://doc.rust-lang.org/stable/rust-by-example/">https://doc.rust-lang.org/stable/rust-by-example/</a></li>
+<li>Rustnomicon: <a href="https://doc.rust-lang.org/nomicon/index.html">https://doc.rust-lang.org/nomicon/index.html</a></li>
+<li>WebAssembly, CLI, Embedded, etc.</li>
+</ul>
+<p>Other Rust Projects</p>
+<ul>
+<li>cargo-generate: <a href="https://cargo-generate.github.io/cargo-generate/index.html">https://cargo-generate.github.io/cargo-generate/index.html</a></li>
+<li>Dioxus: <a href="https://dioxuslabs.com/nightly/guide/">https://dioxuslabs.com/nightly/guide/</a></li>
+</ul>
+<p>Other Projects</p>
+<ul>
+<li>Pan Docs: <a href="https://gbdev.io/pandocs/">https://gbdev.io/pandocs/</a></li>
+<li>Lisp-Flavored Erlang: <a href="https://lfe.io/books/rebar3-quick-start/">https://lfe.io/books/rebar3-quick-start/</a></li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="reference"><a class="header" href="#reference">Reference</a></h1>
 
                     </main>
